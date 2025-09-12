@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estoque - Tênis Vans Knu Skool</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Anton', sans-serif;
+    }
+    #mensagem {
+      transition: opacity 0.5s ease-in-out;
+      opacity: 0;
+    }
+    #mensagem.visivel {
+      opacity: 1;
+    }
+    input:required:invalid {
+      border-color: #ef4444;
+    }
+    input:required:valid {
+      border-color: #22c55e;
+    }
+    header img {
+      width: 100%;
+      max-height: 250px;
+      object-fit: cover;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between">
+
+  <!-- NAVBAR PRETA -->
+  <nav class="w-full bg-black text-white px-6 py-3 fixed top-0 left-0 z-50 flex justify-between items-center">
+    <div class="font-bold text-xl">ESTOQUE</div>
+    <ul class="flex gap-6">
+      <li><a href="#" class="hover:text-gray-400 transition">Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- HEADER COM IMAGEM -->
+  <header class="w-full mt-12">
+    <img src="./img/vans-footer.png" alt="Banner Knu Skool Vans">
+  </header>
+
+  <main class="w-full flex flex-col items-center px-4">
+    <h1 class="text-4xl font-bold mb-6 text-gray-900 text-center tracking-wide uppercase">Estoque - Vans Knu Skool</h1>
+
+    <div id="mensagem" class="hidden bg-green-500 text-white px-4 py-2 rounded mb-4">
+      Produto adicionado com sucesso!
+    </div>
+
+    <!-- FORMULÁRIO DE CADASTRO -->
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow p-6 mb-6">
+      <div class="grid grid-cols-2 gap-4 mb-4">
+        <input id="nome" type="text" placeholder="Nome do produto" class="border p-2 rounded w-full" required>
+        <input id="descricao" type="text" placeholder="Descrição" class="border p-2 rounded w-full">
+        <input id="preco" type="number" placeholder="Preço" class="border p-2 rounded w-full" required>
+        <input id="estoque" type="number" placeholder="Estoque" class="border p-2 rounded w-full" required>
+        <!-- Campo de imagem -->
+        <input id="imagem" type="file" accept="image/*" class="col-span-2 border p-2 rounded w-full" required>
+      </div>
+      <button onclick="adicionarProduto()" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full transition">Adicionar Produto</button>
+    </div>
+
+    <!-- LISTAGEM DE PRODUTOS -->
+    <ul id="lista" class="w-full max-w-2xl bg-white rounded-lg shadow divide-y divide-gray-200 overflow-hidden mb-8"></ul>
+  </main>
+
+  <footer class="text-center text-sm text-gray-500 mb-2">
+    &copy; 2025 Estoque Knu Skool
+  </footer>
+
+  <script>
+    const API = "http://localhost:3000/pictures"; // rota do back
+
+    function mostrarMensagem() {
+      const msg = document.getElementById("mensagem");
+      msg.classList.remove("hidden");
+      msg.classList.add("visivel");
+      setTimeout(() => {
+        msg.classList.remove("visivel");
+        setTimeout(() => msg.classList.add("hidden"), 500);
+      }, 3000);
+    }
+
+    function adicionarProduto() {
+      const nome = document.getElementById("nome").value;
+      const descricao = document.getElementById("descricao").value;
+      const preco = document.getElementById("preco").value;
+      const estoque = document.getElementById("estoque").value;
+      const imagem = document.getElementById("imagem").files[0];
+
+      if (!nome || !preco || !estoque || !imagem) {
+        alert("Preencha todos os campos obrigatórios");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("name", nome);
+      formData.append("descricao", descricao);
+      formData.append("preco", preco);
+      formData.append("estoque", estoque);
+      formData.append("image", imagem);
+
+      fetch(API, {
+        method: "POST",
+        body: formData
+      }).then(() => {
+        document.getElementById("nome").value = "";
+        document.getElementById("descricao").value = "";
+        document.getElementById("preco").value = "";
+        document.getElementById("estoque").value = "";
+        document.getElementById("imagem").value = "";
+        listarProdutos();
+        mostrarMensagem();
+      });
+    }
+
+    function listarProdutos() {
+      fetch(API)
+        .then(res => res.json())
+        .then(produtos => {
+          const lista = document.getElementById("lista");
+          lista.innerHTML = "";
+
+          produtos.forEach(p => {
+            const item = document.createElement("li");
+            item.className = "flex flex-col gap-2 px-4 py-3 hover:bg-gray-50";
+            item.innerHTML = `
+              <div class="grid grid-cols-3 gap-4 items-center">
+                <img src="http://localhost:3000/${p.src}" alt="${p.name}" class="w-24 h-24 object-cover rounded">
+                <div class="col-span-2 grid grid-cols-2 gap-2">
+                  <input type="text" id="nome-${p._id}" value="${p.name}" class="border p-2 rounded w-full" required>
+                  <input type="text" id="descricao-${p._id}" value="${p.descricao || ''}" class="border p-2 rounded w-full">
+                  <input type="number" id="preco-${p._id}" value="${p.preco || 0}" class="border p-2 rounded w-full" required>
+                  <input type="number" id="estoque-${p._id}" value="${p.estoque || 0}" class="border p-2 rounded w-full" required>
+                </div>
+              </div>
+              <div class="flex justify-end gap-2 mt-2">
+                <button onclick="atualizarProduto('${p._id}')" class="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">💾 Salvar</button>
+                <button onclick="excluirProduto('${p._id}')" class="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">🗑️ Excluir</button>
+              </div>
+            `;
+            lista.appendChild(item);
+          });
+        });
+    }
+
+    function atualizarProduto(id) {
+      const nome = document.getElementById(`nome-${id}`).value;
+      const descricao = document.getElementById(`descricao-${id}`).value;
+      const preco = document.getElementById(`preco-${id}`).value;
+      const estoque = document.getElementById(`estoque-${id}`).value;
+
+      const formData = new FormData();
+      formData.append("name", nome);
+      formData.append("descricao", descricao);
+      formData.append("preco", preco);
+      formData.append("estoque", estoque);
+
+      fetch(API + "/" + id, {
+        method: "PUT",
+        body: formData
+      }).then(() => listarProdutos());
+    }
+
+    function excluirProduto(id) {
+      fetch(API + "/" + id, { method: "DELETE" })
+        .then(() => listarProdutos());
+    }
+
+    listarProdutos();
+  </script>
+
+</body>
+</html>
