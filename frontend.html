@@ -3,71 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estoque - Tênis Vans Knu Skool</title>
+  <title>Estoque - Vans Knu Skool</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: 'Anton', sans-serif;
-    }
-    #mensagem {
-      transition: opacity 0.5s ease-in-out;
-      opacity: 0;
-    }
-    #mensagem.visivel {
-      opacity: 1;
-    }
-    input:required:invalid {
-      border-color: #ef4444;
-    }
-    input:required:valid {
-      border-color: #22c55e;
-    }
-    header img {
-      width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-    }
+    body { font-family: 'Anton', sans-serif; }
+    #mensagem { transition: opacity 0.5s ease-in-out; opacity: 0; }
+    #mensagem.visivel { opacity: 1; }
+    input:required:invalid { border-color: #ef4444; }
+    input:required:valid { border-color: #22c55e; }
+    header img { width: 100%; max-height: 200px; object-fit: cover; }
   </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-between">
 
-  <!-- NAVBAR PRETA -->
+  <!-- NAVBAR -->
   <nav class="w-full bg-black text-white px-6 py-3 fixed top-0 left-0 z-50 flex justify-between items-center">
     <div class="font-bold text-xl">ESTOQUE</div>
     <ul class="flex gap-6">
-      <li><a href="#" class="hover:text-gray-400 transition">Logout</a></li>
+      <li><a href="#" onclick="logout()" id="logout-btn" class="hidden hover:text-gray-400 transition">Logout</a></li>
     </ul>
   </nav>
 
-  <!-- HEADER COM IMAGEM -->
+  <!-- HEADER -->
   <header class="w-full mt-12">
     <img src="./img/vans-footer.png" alt="Banner Knu Skool Vans">
   </header>
 
   <main class="w-full flex flex-col items-center px-4">
-    <h1 class="text-4xl font-bold mb-6 text-gray-900 text-center tracking-wide uppercase">Estoque - Vans Knu Skool</h1>
+<!-- ÁREA DE LOGIN -->
+<div id="login-area" class="w-full max-w-sm bg-white p-6 rounded shadow mb-6">
+  <h2 class="text-2xl font-bold mb-4 text-center">Login</h2>
+  <input id="login-email" type="email" placeholder="Email" class="border p-2 rounded w-full mb-2">
+  <input id="login-senha" type="password" placeholder="Senha" class="border p-2 rounded w-full mb-4">
+  <button onclick="login()" class="bg-black text-white px-4 py-2 rounded w-full mb-2">Entrar</button>
+  <p class="text-sm text-center mt-2">Não tem conta? 
+    <a href="#" onclick="mostrarCadastro()" class="text-blue-600">Cadastre-se</a>
+  </p>
+</div>
 
+<!-- ÁREA DE CADASTRO -->
+<div id="cadastro-area" class="hidden w-full max-w-sm bg-white p-6 rounded shadow mb-6">
+  <h2 class="text-2xl font-bold mb-4 text-center">Cadastro</h2>
+  <input id="cad-nome" type="text" placeholder="Nome" class="border p-2 rounded w-full mb-2">
+  <input id="cad-email" type="email" placeholder="Email" class="border p-2 rounded w-full mb-2">
+  <input id="cad-senha" type="password" placeholder="Senha" class="border p-2 rounded w-full mb-4">
+  <button onclick="registrar()" class="bg-green-600 text-white px-4 py-2 rounded w-full mb-2">Registrar</button>
+  <p class="text-sm text-center mt-2">Já tem conta? 
+    <a href="#" onclick="mostrarLogin()" class="text-blue-600">Entrar</a>
+  </p>
+</div>
+
+
+    <!-- MENSAGEM -->
     <div id="mensagem" class="hidden bg-green-500 text-white px-4 py-2 rounded mb-4">
       Produto adicionado com sucesso!
     </div>
 
-    <!-- FORMULÁRIO DE CADASTRO -->
-    <div class="w-full max-w-2xl bg-white rounded-lg shadow p-6 mb-6">
-      <div class="grid grid-cols-2 gap-4 mb-4">
-        <input id="nome" type="text" placeholder="Nome do produto" class="border p-2 rounded w-full" required>
-        <input id="descricao" type="text" placeholder="Descrição" class="border p-2 rounded w-full">
-        <input id="preco" type="number" placeholder="Preço" class="border p-2 rounded w-full" required>
-        <input id="estoque" type="number" placeholder="Estoque" class="border p-2 rounded w-full" required>
-        <!-- Campo de imagem -->
-        <input id="imagem" type="file" accept="image/*" class="col-span-2 border p-2 rounded w-full" required>
-      </div>
-      <button onclick="adicionarProduto()" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full transition">Adicionar Produto</button>
-    </div>
+    <!-- CRUD DE PRODUTOS -->
+    <div id="produtos-area" class="hidden w-full max-w-2xl flex flex-col items-center">
+      <h1 class="text-3xl font-bold mb-6 text-gray-900 text-center tracking-wide uppercase">
+        Estoque - Vans Knu Skool
+      </h1>
 
-    <!-- LISTAGEM DE PRODUTOS -->
-    <ul id="lista" class="w-full max-w-2xl bg-white rounded-lg shadow divide-y divide-gray-200 overflow-hidden mb-8"></ul>
+      <div class="w-full bg-white rounded-lg shadow p-6 mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <input id="nome" type="text" placeholder="Nome do produto" class="border p-2 rounded w-full" required>
+          <input id="descricao" type="text" placeholder="Descrição" class="border p-2 rounded w-full">
+          <input id="preco" type="number" placeholder="Preço" class="border p-2 rounded w-full" required>
+          <input id="estoque" type="number" placeholder="Estoque" class="border p-2 rounded w-full" required>
+          <input id="imagem" type="file" accept="image/*" class="col-span-2 border p-2 rounded w-full">
+        </div>
+        <button onclick="adicionarProduto()" class="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 w-full transition">Adicionar Produto</button>
+      </div>
+
+      <ul id="lista" class="w-full bg-white rounded-lg shadow divide-y divide-gray-200 overflow-hidden mb-8"></ul>
+    </div>
   </main>
 
   <footer class="text-center text-sm text-gray-500 mb-2">
@@ -75,7 +87,8 @@
   </footer>
 
   <script>
-    const API = "http://localhost:3000/pictures"; // rota do back
+    const API_PRODUTOS = "http://localhost:3000/produtos";
+    const API_USUARIOS = "http://localhost:3000/usuarios";
 
     function mostrarMensagem() {
       const msg = document.getElementById("mensagem");
@@ -87,41 +100,90 @@
       }, 3000);
     }
 
+    // === AUTENTICAÇÃO ===
+    async function login() {
+      const email = document.getElementById("login-email").value;
+      const senha = document.getElementById("login-senha").value;
+
+      const res = await fetch(API_USUARIOS + "/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, senha })
+      });
+
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+        document.getElementById("login-area").classList.add("hidden");
+        document.getElementById("produtos-area").classList.remove("hidden");
+        document.getElementById("logout-btn").classList.remove("hidden");
+        listarProdutos();
+      } else {
+        alert("Login inválido!");
+      }
+    }
+
+    async function registrar() {
+      const email = document.getElementById("login-email").value;
+      const senha = document.getElementById("login-senha").value;
+      const nome = email.split("@")[0]; // só para exemplo
+
+      const res = await fetch(API_USUARIOS + "/registrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nome, email, senha })
+      });
+
+      const data = await res.json();
+      if (res.ok) {
+        alert("Usuário registrado com sucesso, faça login!");
+      } else {
+        alert("Erro: " + data.message);
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem("token");
+      document.getElementById("produtos-area").classList.add("hidden");
+      document.getElementById("login-area").classList.remove("hidden");
+      document.getElementById("logout-btn").classList.add("hidden");
+    }
+
+    // === CRUD PRODUTOS ===
     function adicionarProduto() {
+      const token = localStorage.getItem("token");
+      if (!token) return alert("Faça login primeiro");
+
       const nome = document.getElementById("nome").value;
       const descricao = document.getElementById("descricao").value;
       const preco = document.getElementById("preco").value;
       const estoque = document.getElementById("estoque").value;
       const imagem = document.getElementById("imagem").files[0];
 
-      if (!nome || !preco || !estoque || !imagem) {
-        alert("Preencha todos os campos obrigatórios");
-        return;
-      }
-
       const formData = new FormData();
-      formData.append("name", nome);
+      formData.append("nome", nome);
       formData.append("descricao", descricao);
       formData.append("preco", preco);
       formData.append("estoque", estoque);
-      formData.append("image", imagem);
+      if (imagem) formData.append("imagem", imagem);
 
-      fetch(API, {
+      fetch(API_PRODUTOS, {
         method: "POST",
+        headers: { Authorization: "Bearer " + token },
         body: formData
       }).then(() => {
-        document.getElementById("nome").value = "";
-        document.getElementById("descricao").value = "";
-        document.getElementById("preco").value = "";
-        document.getElementById("estoque").value = "";
-        document.getElementById("imagem").value = "";
         listarProdutos();
         mostrarMensagem();
       });
     }
 
     function listarProdutos() {
-      fetch(API)
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      fetch(API_PRODUTOS, {
+        headers: { Authorization: "Bearer " + token }
+      })
         .then(res => res.json())
         .then(produtos => {
           const lista = document.getElementById("lista");
@@ -132,9 +194,9 @@
             item.className = "flex flex-col gap-2 px-4 py-3 hover:bg-gray-50";
             item.innerHTML = `
               <div class="grid grid-cols-3 gap-4 items-center">
-                <img src="http://localhost:3000/${p.src}" alt="${p.name}" class="w-24 h-24 object-cover rounded">
+                ${p.imagem ? `<img src="http://localhost:3000${p.imagem}" alt="${p.nome}" class="w-24 h-24 object-cover rounded">` : ""}
                 <div class="col-span-2 grid grid-cols-2 gap-2">
-                  <input type="text" id="nome-${p._id}" value="${p.name}" class="border p-2 rounded w-full" required>
+                  <input type="text" id="nome-${p._id}" value="${p.nome}" class="border p-2 rounded w-full" required>
                   <input type="text" id="descricao-${p._id}" value="${p.descricao || ''}" class="border p-2 rounded w-full">
                   <input type="number" id="preco-${p._id}" value="${p.preco || 0}" class="border p-2 rounded w-full" required>
                   <input type="number" id="estoque-${p._id}" value="${p.estoque || 0}" class="border p-2 rounded w-full" required>
@@ -151,29 +213,71 @@
     }
 
     function atualizarProduto(id) {
+      const token = localStorage.getItem("token");
       const nome = document.getElementById(`nome-${id}`).value;
       const descricao = document.getElementById(`descricao-${id}`).value;
       const preco = document.getElementById(`preco-${id}`).value;
       const estoque = document.getElementById(`estoque-${id}`).value;
 
       const formData = new FormData();
-      formData.append("name", nome);
+      formData.append("nome", nome);
       formData.append("descricao", descricao);
       formData.append("preco", preco);
       formData.append("estoque", estoque);
 
-      fetch(API + "/" + id, {
+      fetch(API_PRODUTOS + "/" + id, {
         method: "PUT",
+        headers: { Authorization: "Bearer " + token },
         body: formData
       }).then(() => listarProdutos());
     }
 
     function excluirProduto(id) {
-      fetch(API + "/" + id, { method: "DELETE" })
-        .then(() => listarProdutos());
+      const token = localStorage.getItem("token");
+      fetch(API_PRODUTOS + "/" + id, {
+        method: "DELETE",
+        headers: { Authorization: "Bearer " + token }
+      }).then(() => listarProdutos());
     }
 
-    listarProdutos();
+    // Se já estiver logado, mostra produtos
+    if (localStorage.getItem("token")) {
+      document.getElementById("login-area").classList.add("hidden");
+      document.getElementById("produtos-area").classList.remove("hidden");
+      document.getElementById("logout-btn").classList.remove("hidden");
+      listarProdutos();
+    }
+
+    function mostrarCadastro() {
+  document.getElementById("login-area").classList.add("hidden");
+  document.getElementById("cadastro-area").classList.remove("hidden");
+}
+
+function mostrarLogin() {
+  document.getElementById("cadastro-area").classList.add("hidden");
+  document.getElementById("login-area").classList.remove("hidden");
+}
+
+async function registrar() {
+  const nome = document.getElementById("cad-nome").value;
+  const email = document.getElementById("cad-email").value;
+  const senha = document.getElementById("cad-senha").value;
+
+  const res = await fetch(API_USUARIOS + "/registrar", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nome, email, senha })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    alert("Usuário registrado com sucesso! Agora faça login.");
+    mostrarLogin();
+  } else {
+    alert("Erro: " + data.message);
+  }
+}
+
   </script>
 
 </body>
